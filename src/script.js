@@ -20,20 +20,29 @@ require("dotenv").config();
     //     height: 1080,
     //     deviceScaleFactor: 1,
     //   });
-    // await page.setDefaultNavigationTimeout(0);
     
     //our credentials
     var id = process.env.ID;
     var pass = process.env.PASS;
     
     //our script starts now 
-    await page.goto("https://qalam.nust.edu.pk/");
+    await page.goto("https://qalam.nust.edu.pk/", {waitUntil: "networkidle2",});
     await page.setDefaultNavigationTimeout(0);
     await page.waitForTimeout(3500);     //delay of 3.5 seconds
 
     //login
     await login(id,pass,page);
-    await page.waitForTimeout(5500);    //delay of 5.5 seconds
+    await page.waitForTimeout(10500);    //delay of 10.5 seconds
+
+    //clicking on sidemenu
+    await page.click("#sidebar_main_toggle");
+    await page.waitForTimeout(100);    //delay of 0.1 seconds
+
+    //going to feedback page
+    await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
+    await page.waitForTimeout(100);    //delay of 0.1 seconds
+    await page.click("ul > .act_section > ul > li > a");
+    await page.waitForTimeout(8500);    //delay of 8.5 seconds
 
 
     
