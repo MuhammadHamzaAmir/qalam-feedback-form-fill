@@ -32,7 +32,7 @@ require("dotenv").config();
 
     //login
     await login(id,pass,page);
-    await page.waitForTimeout(10500);    //delay of 10.5 seconds
+    await page.waitForTimeout(13500);    //delay of 13.5 seconds
 
     //clicking on sidemenu
     await page.click("#sidebar_main_toggle");
@@ -42,7 +42,7 @@ require("dotenv").config();
     await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
     await page.waitForTimeout(100);    //delay of 0.1 seconds
     await page.click("ul > .act_section > ul > li > a");
-    await page.waitForTimeout(8500);    //delay of 8.5 seconds
+    await page.waitForTimeout(10500);    //delay of 10.5 seconds
 
 
     
