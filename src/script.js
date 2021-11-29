@@ -32,19 +32,23 @@ require("dotenv").config();
 
     //login
     await login(id,pass,page);
-    await page.waitForTimeout(13500);    //delay of 13.5 seconds
+    await page.waitForTimeout(17500);    //delay of 17.5 seconds
 
     //clicking on sidemenu
     await page.click("#sidebar_main_toggle");
     await page.waitForTimeout(100);    //delay of 0.1 seconds
 
     //going to feedback page
+    await page.waitForSelector(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
     await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
     await page.waitForTimeout(100);    //delay of 0.1 seconds
     await page.click("ul > .act_section > ul > li > a");
-    await page.waitForTimeout(10500);    //delay of 10.5 seconds
+    await page.waitForTimeout(11500);    //delay of 11.5 seconds
 
-
+    //clicking on the teacher feedback form
+    xpath_elem = await page.waitForXPath("//li[contains(., 'Teacher')]");   //change of xpath still
+    await xpath_elem.click();
+    await page.waitForTimeout(3000);    //delay of 3 seconds
     
     
     
