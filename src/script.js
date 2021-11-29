@@ -32,7 +32,7 @@ require("dotenv").config();
 
     //login
     await login(id,pass,page);
-    await page.waitForTimeout(17500);    //delay of 17.5 seconds
+    await page.waitForTimeout(20690);    //delay of 20.69 seconds
 
     //clicking on sidemenu
     await page.click("#sidebar_main_toggle");
