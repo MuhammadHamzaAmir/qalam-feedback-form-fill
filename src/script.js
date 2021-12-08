@@ -14,7 +14,7 @@ require("dotenv").config();
     const context = await browser.createIncognitoBrowserContext();
     var page = await context.newPage(); 
 
-    /***when headless = true Comment out the following code**/
+    /***when headless = true (Comment out the following code)**/
     // await page.setViewport({
     //     width: 1920,
     //     height: 1080,
