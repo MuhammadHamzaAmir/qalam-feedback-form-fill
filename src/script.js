@@ -56,14 +56,14 @@ require("dotenv").config();
 })();
 
 //login function
-let login = async (id,pass,page) =>{
+async function login(id, pass, page) {
 
-    await page.type("#login", id, { delay: 69 });      //entering id
-    await page.waitForTimeout(420);     //delay of 0.42 secs
-    await page.type("#password", pass, { delay: 69 });      //entering password
-    await page.waitForTimeout(100);     //delay of 0.1 secs
-    await page.click("button[type='submit']");       //clicking the login button
-    
+    await page.type("#login", id, { delay: 69 }); //entering id
+    await page.waitForTimeout(420); //delay of 0.42 secs
+    await page.type("#password", pass, { delay: 69 }); //entering password
+    await page.waitForTimeout(100); //delay of 0.1 secs
+    await page.click("button[type='submit']"); //clicking the login button
+
 }
 
 
