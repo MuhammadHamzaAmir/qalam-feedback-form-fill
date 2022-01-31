@@ -57,6 +57,19 @@ require("dotenv").config();
 
 //login function
 async function login(id, pass, page) {
+/**
+ * The login function is used to log into the website.
+ * It takes in 3 parameters, id, pass and page.
+ * The function first enters the username into the login field using type method of puppeteer. 
+ * Then it waits for 420 milliseconds before entering password using type method of puppeteer. 
+ * After that it clicks on login button using click method of puppeter and waits for 100 milliseconds before returning control back to main function which calls next functions in sequence after this function returns control back to main().
+ *
+ * @param id - Used to enter the id of the user.
+ * @param pass - Used to enter the password.
+ * @param page - Used to interact with the page.
+ * @return - a promise object.
+ * @doc-author - Trelent
+ */
 
     await page.type("#login", id, { delay: 69 }); //entering id
     await page.waitForTimeout(420); //delay of 0.42 secs
