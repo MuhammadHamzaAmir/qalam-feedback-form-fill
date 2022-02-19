@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "teacher feedback": "node src/teacher_feedback.js",
-    "student feedback": "node src/student_feedback.js"
+    "teacher_feedback": "node src/teacher_feedback.js",
+    "student_feedback": "node src/student_feedback.js"
   },
   "keywords": [],
   "author": "",
