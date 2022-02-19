@@ -71,6 +71,7 @@ require("dotenv").config();
     
     await getCourses(context,page, courses, low_rate,high_rate, comment);
 
+    // verifying the sumbisson of forms
     await page.bringToFront();
     await page.waitForTimeout(1500);
     await page.reload();
@@ -169,19 +170,23 @@ const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
 
 
 
+
 const fillForm = async(page,low_rate,high_rate,comment) => {
-  /**
-   * The fillForm function fills the form with the given parameters.
-   *
-   *
-   * @param page - Used to navigate to the page.
-   * @param low_rate - Used to set the lowest rate for a course.
-   * @param high_rate - Used to determine the maximum rate that can be given to a course.
-   * @param comment - Used to enter a comment in the textarea.
-   * @return - the promise of the submission.
-   *
-   * @doc-author - Trelent
-   */
+/**
+ * The fillForm function fills the form with random values and comments.
+ *
+ * 
+ * @param page - Used to navigate to the page.
+ * @param low_rate - Used to set the minimum rating for a course.
+ * @param high_rate - Used to set the maximum number of stars that can be given to a course.
+ * @param comment - Used to enter the comment in the form.
+ * @return - a promise that resolves when the form is submitted.
+ * 
+ * @doc-author - Trelent
+ */
+
+    // checking if the form is submitted
+    if (!(await isFormSubmitted(page))){
 
     if (low_rate > 5 || low_rate < 1) {
         low_rate = 5;
@@ -194,12 +199,12 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
 
     // iterating over all the course and filling them
     for (let i = 0; i < 15; i++) {
-        let numberGenerated = Math.random()
+        let numberGenerated = await getRandomIntInclusive(low_rate_int,high_rate_int);
         var selector =
             ".table > tbody > tr:nth-child(" +
             (i + 1) +
             ") > td:nth-child(" +
-            (rate_int + 1) +
+            (numberGenerated + 1) +
             ") > input";
 
         let elem = await page.waitForSelector(selector);
@@ -210,7 +215,7 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
                 inline: "center",
             })
         );
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(100);
         await page.click(selector);
     }
 
@@ -224,12 +229,12 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
             inline: "center",
         })
     );
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
     await page.focus(selector);
     await page.keyboard.type(comment);
 
     //submitting the form
-    await page.waitForTimeout(2500);
+    await page.waitForTimeout(1500);
     selector = ".wrap > .container > .js_surveyform > .text-center > .btn";
     elem = await page.waitForSelector(selector);
     await elem.evaluate((el) =>
@@ -239,13 +244,44 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
             inline: "center",
         })
     );
-    await page.waitForTimeout(3000);
-    await page.click(selector);
-
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(2000);
+    await page.click(selector);}
+    
+    else{
+    await page.waitForTimeout(5000);}
 }
 
+
+const isFormSubmitted = async(page) =>{
+/**
+ * The isFormSubmitted function checks if the form has been submitted.
+ *
+ * 
+ * @param page - Used to pass the page object to the isFormSubmitted function.
+ * @return - true if the page is a thank you page and false otherwise.
+ * 
+ * @doc-author - Trelent
+ */
+    let elem = await page.waitForSelector("#wrapwrap > main > div.wrap > div.container > div > h1");
+    let note = await elem.evaluate((el) => el.textContent);
+
+    if (note.includes("Thank")){
+        return true;
+    }
+    else{return false;}
+
+}
 const getRandomIntInclusive = async(min, max) => {
+/**
+ * The getRandomIntInclusive function returns a random integer between the specified minimum and maximum values, inclusive.
+ *
+ * 
+ * @param min - Used to set the lower limit of the random number generated.
+ * @param max - Used to set the upper limit of the random number generated.
+ * @return - a random integer between the specified min and max values.
+ * 
+ * @doc-author - Trelent
+ */
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
