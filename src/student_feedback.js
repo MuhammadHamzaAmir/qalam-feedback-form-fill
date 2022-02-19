@@ -81,7 +81,7 @@ require("dotenv").config();
 })();
 
 //login function
-async function userLogin(id, pass, page) {
+const userLogin = async(id, pass, page) => {
 /**
  * The login function is used to log into the website.
  * It takes in 3 parameters, id, pass and page.
@@ -107,7 +107,7 @@ async function userLogin(id, pass, page) {
 
 
 
-async function getCourses(browser,page,courses,low_rate,high_rate,comment) {
+const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
 /**
  * The getCourses function is used to get the courses from the page.
  *
@@ -153,7 +153,7 @@ async function getCourses(browser,page,courses,low_rate,high_rate,comment) {
         form_page = pages_list[pages_list.length-1]
         await form_page.waitForTimeout(10000);
 
-        await fillForm(form_page,rate,comment);
+        await fillForm(form_page,low_rate,high_rate,comment);
         
         await form_page.waitForTimeout(2000);
         await form_page.close();
@@ -167,74 +167,90 @@ async function getCourses(browser,page,courses,low_rate,high_rate,comment) {
 }
 
 
-//form filling function
-async function fillForm(page,rate,comment) {
+
+
+const fillForm = async(page,low_rate,high_rate,comment) => {
   /**
-   * The fill_form function fills the form with the given rate and comment.
+   * The fillForm function fills the form with the given parameters.
    *
    *
-   * @param page - Used to specify the page to be opened.
-   * @param rate - Used to select the rating for a course.
-   * @param comment - Used to fill the comment box.
-   * @return - the page object.
+   * @param page - Used to navigate to the page.
+   * @param low_rate - Used to set the lowest rate for a course.
+   * @param high_rate - Used to determine the maximum rate that can be given to a course.
+   * @param comment - Used to enter a comment in the textarea.
+   * @return - the promise of the submission.
    *
    * @doc-author - Trelent
    */
-  
-  if (rate > 5 || rate < 1) {
-    rate = 3;
-  }
-  var rate_int = parseInt(rate); 
-  // iterating over all the course and filling them
-  for (let i = 0; i < 15; i++) {
-    var selector =
-      ".table > tbody > tr:nth-child(" +
-      (i + 1) +
-      ") > td:nth-child(" +
-      (rate_int + 1) +
-      ") > input";
-    let elem = await page.waitForSelector(selector);
-    await elem.evaluate((el) =>
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center",
-      })
-    );
-    await page.waitForTimeout(1500);
-    await page.click(selector);
-  }
 
-  // entering input
+    if (low_rate > 5 || low_rate < 1) {
+        low_rate = 5;
+    }
+    if (high_rate > 5 || high_rate < 1) {
+        high_rate = 2;
+    }
+    var low_rate_int = parseInt(low_rate);
+    var high_rate_int = parseInt(high_rate);
+
+    // iterating over all the course and filling them
+    for (let i = 0; i < 15; i++) {
+        let numberGenerated = Math.random()
+        var selector =
+            ".table > tbody > tr:nth-child(" +
+            (i + 1) +
+            ") > td:nth-child(" +
+            (rate_int + 1) +
+            ") > input";
+
+        let elem = await page.waitForSelector(selector);
+        await elem.evaluate((el) =>
+            el.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "center",
+            })
+        );
+        await page.waitForTimeout(1500);
+        await page.click(selector);
+    }
+
+    // entering input
     var selector = "textarea";
     let elem = await page.waitForSelector(selector);
     await elem.evaluate((el) =>
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center",
-      })
+        el.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+        })
     );
     await page.waitForTimeout(3000);
     await page.focus(selector);
     await page.keyboard.type(comment);
 
-  //submitting the form
+    //submitting the form
     await page.waitForTimeout(2500);
     selector = ".wrap > .container > .js_surveyform > .text-center > .btn";
     elem = await page.waitForSelector(selector);
     await elem.evaluate((el) =>
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center",
-      })
+        el.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+        })
     );
     await page.waitForTimeout(3000);
     await page.click(selector);
 
     await page.waitForTimeout(5000);
 }
+
+const getRandomIntInclusive = async(min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
 
 //                                         .,,..
 //                                       .,;iiii;.
