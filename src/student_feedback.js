@@ -114,8 +114,6 @@ async function getCourses(browser,page,courses,rate,comment) {
  * @param page - Used to navigate to the form page.
  * @param courses - Used to store the total number of courses in a page.
  * @param rate - Used to fill the rating and comment parameter is used to fill the comments
-async function fill_form(page,rate,comment) {
-    await page.
  * @param comment - Used to fill the comment section of the form.
  * @return - the total number of courses.
  * 
