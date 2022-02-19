@@ -24,19 +24,20 @@ require("dotenv").config();
     //our credentials
     var id = process.env.ID;
     var pass = process.env.PASS;
-    var rate = process.env.COURSE_RATE;
+    var high_rate = process.env.HIGH_RATE;
+    var low_rate = process.env.LOW_RATE;
     var comment = process.env.COMMENTS;
 
     //total number of courses
     var courses = 0;
     
     //our script starts now 
-    await page.goto("https://qalam.nust.edu.pk/", {waitUntil: "networkidle2",});
+    await page.goto("https://qalam.nust.edu.pk/", {waitUntil: "networkidle2"});
     await page.setDefaultNavigationTimeout(0);
     await page.waitForTimeout(3500);     //waitForTimeout of 3.5 seconds
 
     //login
-    await login(id,pass,page);
+    await userLogin(id,pass,page);
     await page.waitForTimeout(30000);    //waitForTimeout of 30 seconds
 
     //clicking on sidemenu
@@ -50,13 +51,7 @@ require("dotenv").config();
     await page.click("ul > .act_section > ul > li > a");
     await page.waitForTimeout(15500);    //waitForTimeout of 15.5 seconds
 
-    //clicking on the student feedback form
-    // xpath_elem = await page.waitForXPath("//li[contains(., 'Student')]");   //change of xpath still
-    // console.log(xpath_elem);
-    // await xpath_elem;
-
     // clicking student feedback form
-
     var total_forms = await page.$$("div > .uk-row-first > .uk-tab > .uk-active");
 
     for(let i=0;i<total_forms.length;i++){
@@ -74,13 +69,19 @@ require("dotenv").config();
 
     await page.waitForTimeout(3000);    //waitForTimeout of 3 seconds
     
-    await getCourses(context,page, courses, rate, comment);
+    await getCourses(context,page, courses, low_rate,high_rate, comment);
+
+    await page.bringToFront();
+    await page.waitForTimeout(1500);
+    await page.reload();
+    await page.waitForTimeout(5000);
+
     
     await browser.close();
 })();
 
 //login function
-async function login(id, pass, page) {
+async function userLogin(id, pass, page) {
 /**
  * The login function is used to log into the website.
  * It takes in 3 parameters, id, pass and page.
@@ -104,28 +105,30 @@ async function login(id, pass, page) {
 }
 
 
-//getting courses function
-async function getCourses(browser,page,courses,rate,comment) {
 
+
+async function getCourses(browser,page,courses,low_rate,high_rate,comment) {
 /**
- * The getCourses function fills the form for all the courses in a page.
+ * The getCourses function is used to get the courses from the page.
  *
  * 
+ * @param browser - Used to open the browser
  * @param page - Used to navigate to the form page.
- * @param courses - Used to store the total number of courses in a page.
- * @param rate - Used to fill the rating and comment parameter is used to fill the comments
- * @param comment - Used to fill the comment section of the form.
- * @return - the total number of courses.
+ * @param courses - Used to store the courses that are found on the page.
+ * @param low_rate - Used to set the minimum rating of a course.
+ * @param high_rate - Used to set the maximum rate of a course.
+ * @param comment - Used to specify the comment to be filled in the form.
+ * @return - an array of all the courses.
  * 
  * @doc-author - Trelent
  */
+
     courses = await page.$$("#hierarchical-show > div");        //getting total number of courses
-    console.log(courses.length);
     await page.waitForTimeout(1000);
 
     // iterating over all the course and filling them
     for(let i =0 ; i<(courses.length-1);i++){
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(150);
 
         //going to form page
         var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a"
@@ -139,9 +142,8 @@ async function getCourses(browser,page,courses,rate,comment) {
           })
         );
 
-        // await page.evaluate(()=> document.querySelector(selector).scrollIntoView());    //scrolling till that course
 
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(2000);
 
         let form_page = await page.click(selector);
 
@@ -151,9 +153,9 @@ async function getCourses(browser,page,courses,rate,comment) {
         form_page = pages_list[pages_list.length-1]
         await form_page.waitForTimeout(10000);
 
-        await fill_form(form_page,rate,comment);
+        await fillForm(form_page,rate,comment);
         
-        await form_page.waitForTimeout(3000);
+        await form_page.waitForTimeout(2000);
         await form_page.close();
 
         await page.bringToFront();
@@ -166,7 +168,7 @@ async function getCourses(browser,page,courses,rate,comment) {
 
 
 //form filling function
-async function fill_form(page,rate,comment) {
+async function fillForm(page,rate,comment) {
   /**
    * The fill_form function fills the form with the given rate and comment.
    *
