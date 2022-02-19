@@ -76,8 +76,14 @@ require("dotenv").config();
     await page.waitForTimeout(1500);
     await page.reload();
     await page.waitForTimeout(5000);
-
     
+    page.on("dialog", async (dialog) => {
+        await page.waitForTimeout(7000);
+        await dialog.accept();
+    });
+    await page.evaluate(()=>{alert("Feedback Form is Submitted! 😎 ");});
+    await page.waitForTimeout(2500);
+
     await browser.close();
 })();
 
@@ -245,10 +251,11 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
         })
     );
     await page.waitForTimeout(2000);
-    await page.click(selector);}
+    await page.click(selector);
+    await page.waitForTimeout(3000);}
     
     else{
-    await page.waitForTimeout(5000);}
+    await page.waitForTimeout(3000);}
 }
 
 
