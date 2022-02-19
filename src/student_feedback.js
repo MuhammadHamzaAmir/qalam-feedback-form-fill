@@ -24,6 +24,8 @@ require("dotenv").config();
     //our credentials
     var id = process.env.ID;
     var pass = process.env.PASS;
+    var rate = process.env.COURSE_RATE;
+    var comment = process.env.COMMENTS;
 
     //total number of courses
     var courses = 0;
@@ -31,29 +33,48 @@ require("dotenv").config();
     //our script starts now 
     await page.goto("https://qalam.nust.edu.pk/", {waitUntil: "networkidle2",});
     await page.setDefaultNavigationTimeout(0);
-    await page.waitForTimeout(3500);     //delay of 3.5 seconds
+    await page.waitForTimeout(3500);     //waitForTimeout of 3.5 seconds
 
     //login
     await login(id,pass,page);
-    await page.waitForTimeout(20690);    //delay of 20.69 seconds
+    await page.waitForTimeout(30000);    //waitForTimeout of 30 seconds
 
     //clicking on sidemenu
     await page.click("#sidebar_main_toggle");
-    await page.waitForTimeout(100);    //delay of 0.1 seconds
+    await page.waitForTimeout(1000);    //waitForTimeout of 1 seconds
 
     //going to feedback page
     await page.waitForSelector(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
     await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
-    await page.waitForTimeout(100);    //delay of 0.1 seconds
+    await page.waitForTimeout(100);    //waitForTimeout of 0.1 seconds
     await page.click("ul > .act_section > ul > li > a");
-    await page.waitForTimeout(11500);    //delay of 11.5 seconds
+    await page.waitForTimeout(15500);    //waitForTimeout of 15.5 seconds
 
     //clicking on the student feedback form
-    xpath_elem = await page.waitForXPath("//li[contains(., 'STUDENT')]");   //change of xpath still
-    await xpath_elem.click();
-    await page.waitForTimeout(3000);    //delay of 3 seconds
+    // xpath_elem = await page.waitForXPath("//li[contains(., 'Student')]");   //change of xpath still
+    // console.log(xpath_elem);
+    // await xpath_elem;
+
+    // clicking student feedback form
+
+    var total_forms = await page.$$("div > .uk-row-first > .uk-tab > .uk-active");
+
+    for(let i=0;i<total_forms.length;i++){
+        await page.waitForTimeout(29);
+        var selector = "#page_content_inner > div > div > div > div > div > ul.uk-tab > li:nth-child("+(i+1)+") > a"
+        let elem = await page.waitForSelector(selector);
+        let form_name = await elem.evaluate((el)=>el.textContent);
+
+        if (form_name.includes("Student")){
+            await page.click(selector);
+            await page.waitForTimeout(50);
+            break;
+        }
+    }
+
+    await page.waitForTimeout(3000);    //waitForTimeout of 3 seconds
     
-    
+    await getCourses(context,page, courses, rate, comment);
     
     await browser.close();
 })();
@@ -74,14 +95,146 @@ async function login(id, pass, page) {
  * @doc-author - Trelent
  */
 
-    await page.type("#login", id, { delay: 69 }); //entering id
-    await page.waitForTimeout(420); //delay of 0.42 secs
-    await page.type("#password", pass, { delay: 69 }); //entering password
-    await page.waitForTimeout(100); //delay of 0.1 secs
+    await page.type("#login", id, { waitForTimeout: 69 }); //entering id
+    await page.waitForTimeout(420); //waitForTimeout of 0.42 secs
+    await page.type("#password", pass, { waitForTimeout: 69 }); //entering password
+    await page.waitForTimeout(100); //waitForTimeout of 0.1 secs
     await page.click("button[type='submit']"); //clicking the login button
 
 }
 
+
+//getting courses function
+async function getCourses(browser,page,courses,rate,comment) {
+
+/**
+ * The getCourses function fills the form for all the courses in a page.
+ *
+ * 
+ * @param page - Used to navigate to the form page.
+ * @param courses - Used to store the total number of courses in a page.
+ * @param rate - Used to fill the rating and comment parameter is used to fill the comments
+async function fill_form(page,rate,comment) {
+    await page.
+ * @param comment - Used to fill the comment section of the form.
+ * @return - the total number of courses.
+ * 
+ * @doc-author - Trelent
+ */
+    courses = await page.$$("#hierarchical-show > div");        //getting total number of courses
+    console.log(courses.length);
+    await page.waitForTimeout(1000);
+
+    // iterating over all the course and filling them
+    for(let i =0 ; i<(courses.length-1);i++){
+        await page.waitForTimeout(500);
+
+        //going to form page
+        var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a"
+
+        let elem = await page.waitForSelector(selector);
+        await elem.evaluate((el) =>
+          el.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+          })
+        );
+
+        // await page.evaluate(()=> document.querySelector(selector).scrollIntoView());    //scrolling till that course
+
+        await page.waitForTimeout(3000);
+
+        let form_page = await page.click(selector);
+
+        await page.waitForTimeout(5000);
+        var pages_list = await browser.pages();
+        //console.log(pages_list.length);
+        form_page = pages_list[pages_list.length-1]
+        await form_page.waitForTimeout(10000);
+
+        await fill_form(form_page,rate,comment);
+        
+        await form_page.waitForTimeout(3000);
+        await form_page.close();
+
+        await page.bringToFront();
+        await page.waitForTimeout(100);
+
+
+    }
+
+}
+
+
+//form filling function
+async function fill_form(page,rate,comment) {
+  /**
+   * The fill_form function fills the form with the given rate and comment.
+   *
+   *
+   * @param page - Used to specify the page to be opened.
+   * @param rate - Used to select the rating for a course.
+   * @param comment - Used to fill the comment box.
+   * @return - the page object.
+   *
+   * @doc-author - Trelent
+   */
+  
+  if (rate > 5 || rate < 1) {
+    rate = 3;
+  }
+  var rate_int = parseInt(rate); 
+  // iterating over all the course and filling them
+  for (let i = 0; i < 15; i++) {
+    var selector =
+      ".table > tbody > tr:nth-child(" +
+      (i + 1) +
+      ") > td:nth-child(" +
+      (rate_int + 1) +
+      ") > input";
+    let elem = await page.waitForSelector(selector);
+    await elem.evaluate((el) =>
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      })
+    );
+    await page.waitForTimeout(1500);
+    await page.click(selector);
+  }
+
+  // entering input
+    var selector = "textarea";
+    let elem = await page.waitForSelector(selector);
+    await elem.evaluate((el) =>
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      })
+    );
+    await page.waitForTimeout(3000);
+    await page.focus(selector);
+    await page.keyboard.type(comment);
+
+  //submitting the form
+    await page.waitForTimeout(2500);
+    selector = ".wrap > .container > .js_surveyform > .text-center > .btn";
+    elem = await page.waitForSelector(selector);
+    await elem.evaluate((el) =>
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      })
+    );
+    await page.waitForTimeout(3000);
+    await page.click(selector);
+
+    await page.waitForTimeout(5000);
+}
 
 //                                         .,,..
 //                                       .,;iiii;.
