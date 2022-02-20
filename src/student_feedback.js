@@ -42,31 +42,56 @@ require("dotenv").config();
 
     //clicking on sidemenu
     await page.click("#sidebar_main_toggle");
-    await page.waitForTimeout(1000);    //waitForTimeout of 1 seconds
+    await page.waitForTimeout(3000);    //waitForTimeout of 1 seconds
 
     //going to feedback page
-    await page.waitForSelector(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
-    await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
-    await page.waitForTimeout(100);    //waitForTimeout of 0.1 seconds
+    await page
+        .waitForSelector(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a")
+        .then((link)=>{link.click();})
+        .catch((error)=> {return error;});
+    //await page.click(".scrollbar-inner > .menu_section > ul > .submenu_trigger:nth-child(7) > a");
+    await page.waitForTimeout(300);    //waitForTimeout of 0.3 seconds
     await page.click("ul > .act_section > ul > li > a");
     await page.waitForTimeout(15500);    //waitForTimeout of 15.5 seconds
 
     // clicking student feedback form
-    var total_forms = await page.$$("div > .uk-row-first > .uk-tab > .uk-active");
-
-    for(let i=0;i<total_forms.length;i++){
+    var total_forms = await page.$$("#page_content_inner > div > div > div > div > div > ul.uk-tab > li");
+    // console.log(total_forms.length);
+    let specificCourseName = "";
+    for(let i=0;i<(total_forms.length-1);i++){
         await page.waitForTimeout(29);
-        var selector = "#page_content_inner > div > div > div > div > div > ul.uk-tab > li:nth-child("+(i+1)+") > a"
-        let elem = await page.waitForSelector(selector);
-        let form_name = await elem.evaluate((el)=>el.textContent);
+        var selector = "#page_content_inner > div > div > div > div > div > ul.uk-tab > li:nth-child("+(i+1)+") > a";
+        
+        specificCourseName = await page
+          .waitForSelector(selector)
+          .then((head) => {
+            return head.evaluate((stringOut) => {
+              return stringOut.textContent;
+            });
+          })
+          .catch((error) => {
+            return error;
+          });
 
-        if (form_name.includes("Student")){
+        // console.log(elem);
+        if (specificCourseName.includes("POOOOOOO")){
             await page.click(selector);
             await page.waitForTimeout(50);
             break;
         }
-    }
+    }// Student Course Evaluation
 
+    if (!(specificCourseName.includes("POOOOOOO"))){
+             page.on("dialog", async (dialog) => {
+                await page.waitForTimeout(7000);
+                await dialog.accept();
+            });
+            await page.evaluate(()=>{alert("Student Feedback Form does not exist 😅");});
+            await page.waitForTimeout(2500);
+
+            await browser.close();
+        }
+    
     await page.waitForTimeout(3000);    //waitForTimeout of 3 seconds
     
     await getCourses(context,page, courses, low_rate,high_rate, comment);
@@ -135,19 +160,27 @@ const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
 
     // iterating over all the course and filling them
     for(let i =0 ; i<(courses.length-1);i++){
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(250);
 
         //going to form page
-        var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a"
+        var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a";
 
-        let elem = await page.waitForSelector(selector);
-        await elem.evaluate((el) =>
-          el.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-          })
-        );
+        let elem = await page.waitForSelector(selector).then((el)=>{
+            el.evaluate((elementScroller) => {
+                elementScroller.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center",
+                });
+            });
+        });
+        // await elem.evaluate((el) =>
+        //   el.scrollIntoView({
+            // behavior: "smooth",
+            // block: "center",
+            // inline: "center",
+        //   })
+        // );
 
 
         await page.waitForTimeout(2000);
@@ -156,7 +189,6 @@ const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
 
         await page.waitForTimeout(5000);
         var pages_list = await browser.pages();
-        //console.log(pages_list.length);
         form_page = pages_list[pages_list.length-1]
         await form_page.waitForTimeout(10000);
 
@@ -206,35 +238,34 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
     // iterating over all the course and filling them
     for (let i = 0; i < 15; i++) {
         let numberGenerated = await getRandomIntInclusive(low_rate_int,high_rate_int);
-        var selector =
-            ".table > tbody > tr:nth-child(" +
-            (i + 1) +
-            ") > td:nth-child(" +
-            (numberGenerated + 1) +
-            ") > input";
+        await page.waitForTimeout(2100);
+        var selector =".table > tbody > tr:nth-child("+(i + 1) +") > td:nth-child("+(numberGenerated + 1)+") > input";
+        console.log(selector);
+        let elem = await page.waitForSelector(selector).then((el)=>{
+            el.evaluate((elementScroller) => {
+                elementScroller.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center",
+                });
+            });
+        });
 
-        let elem = await page.waitForSelector(selector);
-        await elem.evaluate((el) =>
-            el.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-                inline: "center",
-            })
-        );
-        await page.waitForTimeout(100);
+        await page.waitForTimeout(1000);
         await page.click(selector);
     }
 
     // entering input
     var selector = "textarea";
-    let elem = await page.waitForSelector(selector);
-    await elem.evaluate((el) =>
-        el.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-        })
-    );
+    let elem = await page.waitForSelector(selector).then((el)=>{
+        el.evaluate((elementScroller) => {
+            elementScroller.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "center",
+            });
+        });
+    });
     await page.waitForTimeout(1000);
     await page.focus(selector);
     await page.keyboard.type(comment);
@@ -242,14 +273,15 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
     //submitting the form
     await page.waitForTimeout(1500);
     selector = ".wrap > .container > .js_surveyform > .text-center > .btn";
-    elem = await page.waitForSelector(selector);
-    await elem.evaluate((el) =>
-        el.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-        })
-    );
+    elem = await page.waitForSelector(selector).then((el)=>{
+        el.evaluate((elementScroller) => {
+            elementScroller.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "center",
+            });
+        });
+    });
     await page.waitForTimeout(2000);
     await page.click(selector);
     await page.waitForTimeout(3000);}
@@ -269,12 +301,14 @@ const isFormSubmitted = async(page) =>{
  * 
  * @doc-author - Trelent
  */
-    let elem = await page.waitForSelector("#wrapwrap > main > div.wrap > div.container > div > h1");
-    let note = await elem.evaluate((el) => el.textContent);
-
-    if (note.includes("Thank")){
-        return true;
-    }
+    let selector = "#wrapwrap > main > div.wrap > div.container > div > h1";
+    let elem = await page.waitForSelector(selector)
+                    .then((head)=>{ return head.evaluate((stringOut)=>{return stringOut.textContent;});})
+                    .catch(()=>{return "nothing";});
+    
+    if ((elem.includes("Thank"))){
+            return true;
+        }
     else{return false;}
 
 }
