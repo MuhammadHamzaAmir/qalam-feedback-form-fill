@@ -74,15 +74,15 @@ require("dotenv").config();
           });
 
         // console.log(elem);
-        if (specificCourseName.includes("POOOOOOO")){
+        if (specificCourseName.includes("Student Course Evaluation")){
             await page.click(selector);
             await page.waitForTimeout(50);
             break;
         }
-    }// Student Course Evaluation
+    }
 
-    if (!(specificCourseName.includes("POOOOOOO"))){
-             page.on("dialog", async (dialog) => {
+    if (!(specificCourseName.includes("Student Course Evaluation"))){
+            page.on("dialog", async (dialog) => {
                 await page.waitForTimeout(7000);
                 await dialog.accept();
             });
