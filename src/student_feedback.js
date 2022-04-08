@@ -155,15 +155,15 @@ const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
  * @doc-author - Trelent
  */
 
-    courses = await page.$$("#hierarchical-show > div");        //getting total number of courses
+    courses = await page.$$("li[aria-hidden='false'] > #hierarchical-show > div");        //getting total number of courses
     await page.waitForTimeout(1000);
 
     // iterating over all the course and filling them
-    for(let i =0 ; i<(courses.length-1);i++){
+    for(let i =0 ; i<(courses.length);i++){
         await page.waitForTimeout(250);
 
         //going to form page
-        var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a";
+        var selector = "li[aria-hidden='false'] > #hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a";
 
         let elem = await page.waitForSelector(selector).then((el)=>{
             el.evaluate((elementScroller) => {
