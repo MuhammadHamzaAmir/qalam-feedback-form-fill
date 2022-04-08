@@ -54,7 +54,7 @@ require("dotenv").config();
     await page.click("ul > .act_section > ul > li > a");
     await page.waitForTimeout(15500);    //waitForTimeout of 15.5 seconds
 
-    // clicking student feedback form
+    // clicking Teacher Evaluation feedback form
     var total_forms = await page.$$("#page_content_inner > div > div > div > div > div > ul.uk-tab > li");
     // console.log(total_forms.length);
     let specificCourseName = "";
@@ -74,19 +74,19 @@ require("dotenv").config();
           });
 
         // console.log(elem);
-        if (specificCourseName.includes("Student Course Evaluation")){
+        if (specificCourseName.includes("Teacher Evaluation")){
             await page.click(selector);
             await page.waitForTimeout(50);
             break;
         }
     }
 
-    if (!(specificCourseName.includes("Student Course Evaluation"))){
+    if (!(specificCourseName.includes("Teacher Evaluation"))){
             page.on("dialog", async (dialog) => {
                 await page.waitForTimeout(7000);
                 await dialog.accept();
             });
-            await page.evaluate(()=>{alert("Student Feedback Form does not exist 😅");});
+            await page.evaluate(()=>{alert("Teacher Evaluation Feedback Form does not exist 😅");});
             await page.waitForTimeout(2500);
 
             await browser.close();
@@ -155,15 +155,15 @@ const getCourses = async(browser,page,courses,low_rate,high_rate,comment) => {
  * @doc-author - Trelent
  */
 
-    courses = await page.$$("#hierarchical-show > div");        //getting total number of courses
+    courses = await page.$$("li[aria-hidden='false'] > #hierarchical-show > div");        //getting total number of courses
     await page.waitForTimeout(1000);
 
     // iterating over all the course and filling them
-    for(let i =0 ; i<(courses.length-1);i++){
+    for(let i =0 ; i<(courses.length);i++){
         await page.waitForTimeout(250);
 
         //going to form page
-        var selector = "#hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a";
+        var selector = "li[aria-hidden='false'] > #hierarchical-show > div:nth-child("+(i+1)+") > ul > li:nth-child(1) > a";
 
         let elem = await page.waitForSelector(selector).then((el)=>{
             el.evaluate((elementScroller) => {
@@ -236,11 +236,11 @@ const fillForm = async(page,low_rate,high_rate,comment) => {
     var high_rate_int = parseInt(high_rate);
 
     // iterating over all the course and filling them
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
         let numberGenerated = await getRandomIntInclusive(low_rate_int,high_rate_int);
         await page.waitForTimeout(2100);
         var selector =".table > tbody > tr:nth-child("+(i + 1) +") > td:nth-child("+(numberGenerated + 1)+") > input";
-        console.log(selector);
+        // console.log(selector);
         let elem = await page.waitForSelector(selector).then((el)=>{
             el.evaluate((elementScroller) => {
                 elementScroller.scrollIntoView({
