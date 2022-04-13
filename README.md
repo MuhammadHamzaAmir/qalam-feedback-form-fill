@@ -1,6 +1,6 @@
 # Qalam Feedback Form
 
-> Teacher Feedback form is in-progress
+<!-- > Teacher Feedback form is in-progress -->
 
 ### Prerequisites
  - Node v16.5.0 or above
